@@ -1,0 +1,66 @@
+table   {
+    border-style:solid;
+    border-width:2px;
+    border-color:#4E4E4E;
+    border-collapse:collapse;
+    padding:0;
+}
+
+td  {
+    width:25px;
+    height:75px;
+    cursor:pointer;
+}
+
+td a    {
+    display:block;
+    width:100%;
+    height:100%;
+}
+
+p {
+	font-family:Arial;
+	font:Georgia, Times, sans-serif;
+    color:#F4F4F4;
+	margin:5px;
+}
+
+button {
+    width:70px;
+	height:25px;
+}
+
+button#af {
+    width:230px;
+    height:40px;
+}
+
+button#lbt    {
+    width:226px;
+	height:25px;
+}
+
+output {
+	display: inline-block;
+	width: 29px;
+}
+
+hr { color:#F8F8F8; }
+
+input#fd    {
+    width:45px;
+	height:19px;
+}
+
+input#rg    { width:120px; }
+
+form {
+    font:18px Georgia, Times, sans-serif;
+    color:#F8F8F8;
+    display:inline;
+}
+
+input#dly    {
+    width:45px;
+	height:19px;
+}

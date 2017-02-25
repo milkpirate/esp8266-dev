@@ -1,0 +1,26 @@
+﻿﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <title>Login</title>
+</head>
+<body>
+	<form action="/">
+	USER: <input type="text"		name="user" value="username"></br>
+	PASS: <input type="password"	name="pass" value="password"></br>
+	<input type="submit" value="Enter">
+	</form>
+	
+	</br></br>
+
+	<h2>
+<?lua
+	if user == "richard" and pass == "1234" then
+		print("OK!")
+	else
+		print("WRONG!")
+	end
+?>
+	</h2>
+</body>
+</html>

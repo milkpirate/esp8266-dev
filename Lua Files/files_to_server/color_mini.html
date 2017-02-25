@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<head>
+    <title>Color Codes</title>
+    <style type="text/css">
+        #colorchart td{
+            width:25px;
+            height:75px;
+            cursor:pointer;
+        }
+        #colorchart{
+            border:0;
+            padding:0;
+            border-collapse:collapse;
+        }
+        td a{
+            display:block;
+            width:100%;
+            height:100%;
+        }
+    </style>
+</head>
+
+<script language="javascript" type="text/javascript">
+var colors = ["FF0000","FF4000","FF8000","FFBF00","FFFF00","BFFF00","80FF00","40FF00","00FF00","00FF40","00FF80","00FFBF","00FFFF","00BFFF","0080FF","0040FF","0000FF","4000FF","8000FF","BF00FF","FF00FF","FF00BF","FF0080","FF0040"];
+var len = colors.length
+
+// ======================================================================
+// color table
+// ======================================================================
+var swc_table = "<table id=\"colorchart\">";
+
+// colors
+// ======================================================================
+swc_table += "<tr>";
+for (var i=0; i<len; i++) {
+    swc_table += "<td bgColor=\"#"+colors[i]+"\"><a href=\"?color="+colors[i]+"\"></a></td>";
+}
+swc_table += "</tr>";
+
+// gray scale
+// ======================================================================
+swc_table += "<tr>";
+for (var i=0; i<len; i++) {
+    var color = Math.round(i*255/len);
+    
+    if (color <= 16)    color = '0'+color.toString(16);
+    else                color =     color.toString(16);
+    
+    color = color.repeat(3)
+    swc_table += "<td bgColor=\"#"+color+"\"><a href=\"?color="+color+"\"></a></td>";
+}
+swc_table += "</tr>";
+
+// ======================================================================
+// end table and print out
+// ======================================================================
+swc_table += "</table>";
+document.write(swc_table);
+
+</script>
+
+</body>
+</html>

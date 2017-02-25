@@ -1,0 +1,16 @@
+<html>
+	<body>
+		<img src="/NodeMCU.jpg"/>
+		<table>
+			<tr><th>Key</th><th>Value</th></tr>
+			<? for k, v in pairs(req) do ?>
+			<tr><td><?=k?></td><td><?=tostring(v)?></td></tr>
+			<? end ?>
+		</table>
+		<?
+		s = "This is a test of multiline."
+		s = s.. "<br/>Will this work?"
+		if s:len() > 10 then req.send(s) end
+		?>
+	</body>
+</html>

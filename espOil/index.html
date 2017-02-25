@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- <body bgcolor="#202020"> -->
+
+<head>
+	<title>Oil Tank</title>
+	<script src='http://code.jquery.com/jquery-latest.min.js'></script>
+	<script>
+		//var settings	= JSON.parse('LUA_set')
+		//var wifi_conf	= JSON.parse('LUA_wif')
+		
+		var settings	= JSON.parse('{"channelid":<ch_id>,"time":"Sun, 29 May 2016 11:43:43","fuellung":3205.54,"lit_pro_cm":35.45,"tank_vol":4000,"temp_corr":15,"tank_hi":150,"sensor_offset":0,"update_intv":12,"api_key":"<api_key>","avg_num":16}')
+		var wifi_conf	= JSON.parse('{"sta_conf":{"host":"Oil-Monitor","desip":240,"ssid":"<ssid>"},"mode":1,"actip":"192.168.177.240","ap_conf":{"pwd":"<pass>","ssid":"Oil_Monitor"}}')
+		
+		// objects
+		var settings, wifi_conf, thingspeak_set = {};
+				
+		var fillForms = function() {
+			var settingsToManipulate = ["lit_pro_cm", "temp_corr", "sensor_offset", "tank_hi", "avg_num", "update_intv", "tank_vol"];
+			for (let settingsItem of settingsToManipulate) {
+				//document.getElementById(settingsItem).value = settings[settingsItem];
+				$("#"+settingsItem).val(settings[settingsItem]).change();
+			}
+			$("#ssid").val(wifi_conf.sta_conf.ssid).change();
+			$('#fuellung').text(settings.fuellung);
+			$('#time').text(settings.time);
+		}
+		
+		var dw = function(data){
+			document.write(data);
+		}
+		
+		var isNumber = function(n) {
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		}
+		
+		var submitForm = function(formName){
+			var formVals = {};
+			var formEl = document.getElementById(formName);
+			var inputEls = formEl.getElementsByTagName("input");
+			var toSubmit = -1;	// initial state
+			
+			for(var i = 0; i < inputEls.length; i++) {
+				var elementId = inputEls[i].getAttribute("id");
+				if(elementId != undefined) {
+					if (formName == "settings") {
+						if ( !isNumber(inputEls[i].value) ) {
+							toSubmit = 1	// raise malformed execption
+							break
+						}
+					}
+					formVals[elementId] = inputEls[i].value;
+					var objectToSEdit = this[formName]
+					if (formVals[elementId] != objectToSEdit[elementId]) toSubmit = 0 // everthings fine (so far)
+				}
+			}
+			
+			if ((formName == "wifi_conf") && (formVals.pwd == "")) toSubmit = 2;
+			formVals["conf"] = formName;
+						
+			/*	%E4 %F6 %FC		ä ö ü
+				%C4 %D6 %DC		Ä Ü Ö
+				%DF				ß		*/
+			switch(toSubmit) {
+				case 0:
+					var jsonString = JSON.stringify(formVals);
+					window.location.href = window.location.protocol + "//" + window.location.host + "/" + jsonString;
+					//window.location.href = "http://192.168.177.240/" 	+ jsonString;
+					console.log(window.location.href);
+					
+					retrieveSettings();
+					fillForms();
+					break;
+				case 1:
+					alert(unescape("ACHTUNG!\n\nEinstellungen: Fehlformatierte Eingabe!"));
+					break;
+				case 2:
+					alert("ACHTUNG!\n\nWLAN Einstellungen: Kein Passwort angegeben!");
+					break;
+				default:
+					alert(unescape("ACHTUNG!\n\nEinstellungen: Kein Wert ge%E4ndert!"));
+			}
+		}
+
+		thingspeak_set.height		= 300;
+		thingspeak_set.width		= 600;
+		thingspeak_set.displaydays	= 30;
+		thingspeak_set.title		= "";
+		thingspeak_set.ymax			= settings.tank_vol;
+		thingspeak_set.api_key		= settings.api_key;
+		thingspeak_set.channelid	= settings.channelid;
+
+		if (wifi_conf.mode == 1) {	// sta mode
+			var wifi_mode = '<font color="green">Verbunden</font>'
+			var wifi_ssid = wifi_conf.sta_conf.ssid
+		} else {					// softap mode
+			var wifi_mode = '<font color="red">Soft AP Modus</font>'
+			var wifi_ssid = wifi_conf.ap_conf.ssid+"\nPassword:  "+wifi_conf.ap_conf.pwd
+		}
+		
+		// jquery doc ready
+		$(document).ready(function() {
+			fillForms();
+		});
+		
+	</script>
+	<style>
+		input  		    	{ width:100px }
+		button#settings-btn	{ width:70px }
+		button#wifi-btn    	{ width:70px }
+		div.tank_stat		{ display:inline }
+	</style>
+</head>
+
+<h2>Tank Status</h2>
+<pre>
+F&uuml;llstand: <font size="5"><div id="fuellung" class="tank_stat">N/A</div> l</font> 
+Stand:     <div id="time" class="tank_stat">N/A</div>
+</pre>
+<hr>
+
+<!-- <script>dw(settings.fuellung)</script> -->
+
+<script>
+	dw('<iframe ');
+	dw('width="'+thingspeak_set.width+'" ');
+	dw('height="'+thingspeak_set.height+'" ');
+	dw('style="border: 1px solid #cccccc;" src="http://api.thingspeak.com/channels/'+thingspeak_set.channelid);
+	dw('/charts/1?width='+thingspeak_set.width+'&height='+thingspeak_set.height);
+	dw('&dynamic=true&api_key='+thingspeak_set.api_key);
+	dw('&export=true&yaxismin=0&yaxismax='+thingspeak_set.ymax+'&days='+thingspeak_set.displaydays+'&title="'+thingspeak_set.title+'"');
+	dw('></iframe>')
+</script>
+<hr>
+
+<h3>Einstellungen</h3>
+
+<form id="settings">
+<pre>
+Volumen pro cm Tankh&ouml;he:           <input name="lit_pro_cm" id="lit_pro_cm"> l/cm
+Durchschnittstemperatur im Raum:   <input name="temp_corr" id="temp_corr"> &deg;C
+Sensor Offset:                     <input name="sensor_offset" id="sensor_offset"> cm
+Tankh&ouml;he:                          <input name="tank_hi" id="tank_hi"> cm
+Tankvolumen:                       <input name="tank_vol" id="tank_vol"> l
+Updateinterval:                    <input name="update_intv" id="update_intv"> h
+Anzahl der Pings:                  <input name="avg_num" id="avg_num"> #
+</pre>
+<button onclick="submitForm('settings')" type="button" id="settings-btn">OK</button>
+</form>
+
+</br>
+Dezimaltrennzeichen: . (Punkt, nicht Komma!)
+<hr>
+
+<h3>WLAN Einstellungen</h3>
+
+<pre>
+Status:    <script>dw(wifi_mode)</script>
+SSID:      <script>dw(wifi_ssid)</script>
+IP:        <script>dw(wifi_conf.actip)</script>
+<form id="wifi_conf">
+WLAN SSID:        <input name="ssid" id="ssid">   
+WLAN Passwort:    <input name="pwd" id="pwd">
+</pre>
+<button onclick="submitForm('wifi_conf')" type="button" id="wifi-btn">OK</button>
+</form>
+</br></br>
+Werden diese Einstellung ge&auml;ndert kann die &Uuml;bernahme bis zu 1 Minute dauern.</br>
+Das Modul wird versuchen eine IP folgener Gestal zu beziehen: <b>192.168.xxx.<script>dw(wifi_conf.sta_conf.desip)</script></b>.
+<hr>
+
+&copy; milkpirate</body></html>
+</body>
+</html>

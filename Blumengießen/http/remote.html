@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<body bgcolor="#808080">
+
+<head>
+    <title>Lamp Remote Controll</title>
+    <link href="styles.css" type="text/css" rel="stylesheet">
+</head>
+
+<center>
+
+<p>Wifi lamp controll</p>   <hr>
+
+<script language="javascript" type="text/javascript">
+var colors = ["FF0000","FF4000","FF8000","FFBF00","FFFF00","BFFF00","80FF00","40FF00","00FF00","00FF40","00FF80","00FFBF","00FFFF","00BFFF","0080FF","0040FF","0000FF","4000FF","8000FF","BF00FF","FF00FF","FF00BF","FF0080","FF0040"];
+var len = colors.length
+// ======================================================================
+// color table
+// ======================================================================
+var swc_table = "<table id=\"colorchart\">";
+swc_table += "<tr>";
+for (var i=0; i<len; i++) {
+    var color = colors[i].toUpperCase();
+    swc_table += "<td bgColor=\"#"+color+"\"><a href=\"index.lua?color="+color+"\"></a></td>";
+}
+swc_table += "</tr>";
+// ======================================================================
+// end table and print out
+// ======================================================================
+swc_table += "</table>";
+document.write(swc_table);
+</script>
+
+</br>
+
+<script language="javascript" type="text/javascript">
+var swc_table = "<table id=\"greychart\">";
+// ======================================================================
+// grey table
+// ======================================================================
+swc_table += "<tr>";
+for (var i=0; i<len; i++) {
+    var grey = Math.round(i*255/(len-1));
+    
+    if (grey <= 16)    grey = '0'+grey.toString(16);
+    else               grey =     grey.toString(16);
+    
+    grey = grey.repeat(3).toUpperCase();
+    swc_table += "<td bgColor=\"#"+grey+"\"><a href=\"index.lua?color="+grey+"\"></a></td>";
+}
+swc_table += "</tr>";
+// ======================================================================
+// end table and print out
+// ======================================================================
+swc_table += "</table>";
+document.write(swc_table);
+</script>
+
+<hr>    </br>
+
+<form action="index.lua"><input id="bt" type="submit" name="light" value="Light"></form>
+<form action="index.lua">
+<input id="bt" type="submit" value="Rainbow">
+<input id="fd" type="text" name="raindelay" value="50"> ms
+</form>
+
+</br>
+
+<form action="index.lua">
+<input id="fd" type="submit" value="OK ">
+<input id="rg" type="range" name="bright" min="0" max="100" value="100" step="5" onchange="showValue(this.value)" />
+<span id="range">100</span>
+<script type="text/javascript">function showValue(newValue){document.getElementById("range").innerHTML=newValue;}</script>%
+</form>
+
+</br></br>
+
+<form action="index.lua"><input id="af" type="submit" name="total" value="OFF"></form>
+
+</center>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- <body bgcolor="#202020"> -->
+
+<head>
+	<title>Oil Tank</title>
+	<!-- <script src="https://code.jquery.com/jquery-1.10.2.js"></script> -->
+	<!-- <script src="https://code.jquery.com/jquery-3.0.0.min.js"></script> -->
+	<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script> -->	
+	<script>
+		//var settings	= JSON.parse('LUA_settings')
+		//var wifi_conf	= JSON.parse('LUA_wifi_conf')
+		
+		var settings	= JSON.parse('{"channelid":<ch_id>,"time":"Sun, 29 May 2016 11:43:43","fuellung":3205.54,"lit_pro_cm":35.45,"tank_vol":4000,"temp_corr":15,"tank_hi":150,"sensor_offset":0,"update_intv":12,"api_key":"<api_key>","avg_num":16}')
+		var wifi_conf	= JSON.parse('{"sta_conf":{"host":"Oil-Monitor","desip":240,"ssid":"<ssid>"},"mode":1,"actip":"192.168.177.240","ap_conf":{"pwd":"<pass>","ssid":"Oil_Monitor"}}')
+		
+		var oldJsonString = ""
+		
+		var dw = function(data){
+			document.write(data);
+		}
+		
+		var isNumber = function(n) {
+			return !isNaN(parseFloat(n)) && isFinite(n);
+		}
+		
+		var httpGet = function(theUrl) {
+			var xmlHttp = new XMLHttpRequest();
+			xmlHttp.open("GET", theUrl);
+			xmlHttp.send(null);
+			return xmlHttp.responseText;
+		}
+		
+		var submitForm = function(formName){
+			var formVals = {};
+			var formEl = document.getElementById(formName);
+			var inputEls = formEl.getElementsByTagName("input");
+			var toSubmit = -1;	// initial state
+			
+			for(var i = 0; i < inputEls.length; i++) {
+				var elementId = inputEls[i].getAttribute("id");
+				if(elementId != undefined) {
+					if (formName == "settings") {
+						if ( !isNumber(inputEls[i].value) ) {
+							toSubmit = 1	// raise malformed execption
+							break
+						}
+					}
+					formVals[elementId] = inputEls[i].value;
+					var objectToSEdit = this[formName]
+					if (formVals[elementId] != objectToSEdit[elementId]) toSubmit = 0 // everthings fine (so far)
+				}
+			}
+			
+			formVals["conf"] = formName;
+						
+			/*	%E4 %F6 %FC		ä ö ü
+				%C4 %D6 %DC		Ä Ü Ö
+				%DF				ß		*/
+			
+			switch(toSubmit) {
+				case 0:
+					if (formVals.pwd == "") {
+						alert("ACHTUNG!\n\nWLAN Einstellungen: Kein Passwort angegeben!");
+					}
+					else {
+						var jsonString = JSON.stringify(formVals);
+						
+						if (oldJsonString != jsonString) {
+							//window.location.href = window.location.href.toString().split("?")[0] + "?" + jsonString;
+							//window.location.href = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname + "?" + jsonString;
+							httpGet("?" + jsonString)
+							alert(unescape("Einstellungen %FCbernommen."));
+							oldJsonString = jsonString
+						}
+						else {
+							alert(unescape("ACHTUNG:\n\nEinstellungen nicht ge%E4ndert!"));
+						}
+						
+					}
+					break;
+				case 1:
+					alert(unescape("ACHTUNG!\n\nEinstellungen: Fehlformatierte Eingabe!"));
+					break;
+				default:
+					alert(unescape("ACHTUNG!\n\nEinstellungen: Kein Wert ge%E4ndert!"));
+			}
+		}
+		
+		if (wifi_conf.mode == 1) {	// sta mode
+			var wifi_mode = '<font color="green">Verbunden</font>'
+			var wifi_ssid = wifi_conf.sta_conf.ssid
+		} else {					// softap mode
+			var wifi_mode = '<font color="red">Soft AP Modus</font>'
+			var wifi_ssid = wifi_conf.ap_conf.ssid+"\nPassword:  "+wifi_conf.ap_conf.pwd
+		}
+		
+		var height		= 300
+		var width		= 600
+		var ymax		= settings.tank_vol
+		var displaydays	= 30
+		var title		= ""
+		
+		settings.fuellung = Number(settings.fuellung.toFixed(0))
+	</script>
+	<style>
+		input  		    	{ width:100px }
+		button#settings-btn	{ width:70px }
+		button#wifi-btn    	{ width:70px }
+		p#settings-msgs		{ display:none }
+	</style>
+</head>
+
+<h2>Tank Status</h2>
+<pre>
+F&uuml;llstand: <font size="5"><script>dw(settings.fuellung)</script> l</font> 
+Stand:     <script>dw(settings.time)</script>
+</pre>
+<hr>
+
+<script> dw('<iframe width="'+width+'" height="'+height+'" style="border: 1px solid #cccccc;" src="http://api.thingspeak.com/channels/'+settings.channelid+'/charts/1?width='+width+'&height='+height+'&dynamic=true&api_key='+settings.api_key+'&export=true&yaxismin=0&yaxismax='+ymax+'&days='+displaydays+'&title='+title+'"></iframe>')</script>
+<hr>
+
+<h3>Einstellungen</h3>
+
+<form id="settings">
+<pre>
+Volumen pro cm Tankh&ouml;he:           <input name="lit_pro_cm" id="lit_pro_cm"> l/cm
+Durchschnittstemperatur im Raum:   <input name="temp_corr" id="temp_corr"> &deg;C
+Sensor Offset:                     <input name="sensor_offset" id="sensor_offset"> cm
+Tankh&ouml;he:                          <input name="tank_hi" id="tank_hi"> cm
+Tankvolumen:                       <input name="tank_vol" id="tank_vol"> l
+Updateinterval:                    <input name="update_intv" id="update_intv"> h
+Anzahl der Pings:                  <input name="avg_num" id="avg_num"> #
+</pre>
+<button onclick="submitForm('settings')" type="button" id="settings-btn">OK</button> <p id="settings-msgs">HELLO</p>
+</form>
+
+</br>
+Dezimaltrennzeichen: . (Punkt, nicht Komma!)
+<hr>
+
+<h3>WLAN Einstellungen</h3>
+
+<pre>
+Status:    <script>dw(wifi_mode)</script>
+SSID:      <script>dw(wifi_ssid)</script>
+IP:        <script>dw(wifi_conf.actip)</script>
+<form id="wifi_conf">
+WLAN SSID:        <input name="ssid" id="ssid">   
+WLAN Passwort:    <input name="pwd" id="pwd">
+</pre>
+<button onclick="submitForm('wifi_conf')" type="button" id="wifi-btn">OK</button>
+</form>
+</br></br>
+Werden diese Einstellung ge&auml;ndert kann die &Uuml;bernahme bis zu 1 Minute dauern.</br>
+Das Modul wird versuchen eine IP folgener Gestal zu beziehen: <b>192.168.xxx.<script>dw(wifi_conf.sta_conf.desip)</script></b>.
+
+<!-- write actual values to forms -->
+<script>
+document.getElementById("lit_pro_cm").value		= settings.lit_pro_cm
+document.getElementById("temp_corr").value		= settings.temp_corr
+document.getElementById("sensor_offset").value	= settings.sensor_offset
+document.getElementById("tank_hi").value		= settings.tank_hi
+document.getElementById("ssid").value			= wifi_conf.sta_conf.ssid
+document.getElementById("avg_num").value		= settings.avg_num
+document.getElementById("update_intv").value	= settings.update_intv
+document.getElementById("tank_vol").value		= settings.tank_vol
+</script>
+<hr>
+
+&copy; milkpirate</body></html>
+</body>
+</html>

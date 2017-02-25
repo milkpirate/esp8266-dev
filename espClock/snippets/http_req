@@ -1,0 +1,14 @@
+http.request("http://time.is", "HEAD", "", "", function(code, data)
+    print(code, data)
+end)
+
+http.request("http://httpbin.org", "HEAD", "", "", function(code, data)
+    print(code, data)
+end)
+
+req = "HEAD / HTTP/1.1\r\nHost: time.is\r\n"..
+      "User-Agent: X\r\n\r\n"
+conn=net.createConnection(net.TCP, 0)
+conn:on("connection",function(conn, data) conn:send(req) end)  
+conn:on("receive", function(conn, data) print(data) end)
+conn:connect(80,"time.is")

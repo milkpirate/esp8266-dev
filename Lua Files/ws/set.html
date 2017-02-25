@@ -1,0 +1,6 @@
+<?lua
+	if get["gpio"] ~= nil and get["state"] ~= nil then
+		gpio.mode(get["gpio"],gpio.OUTPUT)
+		gpio.write(get["gpio"],get["state"])
+	end
+?>

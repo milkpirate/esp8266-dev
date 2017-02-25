@@ -1,0 +1,31 @@
+Hi!
+
+one imho - if you use windows for download lua to the esp8266 - try YAT(from sf.net) it can insert delay between send string (500ms enought for me)
+and second - this work for me:
+
+Code: Select all
+s=net.createServer(net.TCP)
+ s:listen(80,function(c)
+ c:on("receive",function(c,pl)
+  for v,i in pairs{2,8,9} do
+   gpio.mode(i,gpio.OUTPUT)
+   c:send("\ngpio("..i.."):"..gpio.read(i))
+   if string.find(pl,"gpio"..i.."=0") then gpio.write(i,0) end
+   if string.find(pl,"gpio"..i.."=1") then gpio.write(i,1) end
+   c:send("\nnew_gpio("..i.."):"..gpio.read(i))
+  end
+  c:send("\nTMR:"..tmr.now().." MEM:"..node.heap())
+ c:on("sent",function(c) c:close() end)
+ end)
+end)
+
+
+with this you can post GET query like this:
+
+http://192.168.x.x/gpio8=1
+or
+http://192.168.x.x/gpio2=1&gpio8=0
+or
+http://192.168.x.x/gpio9=1&gpio2=1
+or
+http://192.168.x.x/gpio9=1&gpio2=1&gpio8=1

@@ -1,0 +1,70 @@
+<html>
+	<head>
+		<title>NodeMCU IDE</title>
+		<style>
+		#editor {width:800;border:1px solid black;overflow:hidden}
+		</style>
+ 	</head>
+	<body>
+		<h1>NodeMCU IDE</h1>
+
+        <?
+		local l = file.list();
+        for k,v in pairs(l) do
+		?>
+            <a href="javascript:load('<?=k?>')"><?=k?></a>, size:<?=v?><br>
+        <? end ?>
+
+		<input name="file" type="text"/>
+		<div id="editor"></div>
+		<button onclick="save()">Save</button>
+		<button onclick="compile()">Compile</button>
+		<button onclick="run()">Run</button>
+		<w></w>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.8/ace.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+var editor = ace.edit("editor");
+editor.setOptions({maxLines:Infinity});
+editor.setTheme("ace/theme/chromes");
+editor.getSession().setUseWrapMode(true);
+
+var fileName = "";
+
+function tag(value){ document.getElementsByTagName('w')[0].innerHTML=value; }
+function fbox(value){ document.getElementsByName('file')[0].value=value; }
+function box(value,id){ editor.setValue(value); }
+
+function ajax(method, url, data, fn) {
+	var x=new XMLHttpRequest();
+	x.onreadystatechange=function() { if(x.readyState==4) fn(x.responseText); };
+	x.open(method,url,true);
+	x.send(data);
+}
+
+function load(file) {
+	fileName = file;
+	fbox(file);
+	editor.getSession().setMode(/\.lua/.test(file) ? "ace/mode/lua" : "ace/mode/luapage");
+	ajax('GET', '/'+fileName+'?ext=txt', null, box);
+	return false;
+}
+
+function save() {
+	tag('Saving');
+	var data = new Blob([editor.getValue()],{type:'text/plain'});
+	ajax('POST', '/save.lua?fileName='+fileName, data, tag);
+}
+
+function compile() {
+	tag('Compiling');
+	var data = new Blob([editor.getValue()],{type:'text/plain'});
+	ajax('GET', '/compile.lua?fileName='+fileName, null, tag);
+}
+
+function run() {
+	tag('Running');
+	ajax('GET', '/run.lua?fileName='+fileName, null, tag);
+}
+		</script>
+    </body>
+</html>

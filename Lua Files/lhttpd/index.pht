@@ -1,0 +1,17 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Test Script Page</title>
+</head>
+<body>
+	<form method="GET"><input type="text" name="data" value="hello" /><input type="submit" value="Get" /></form>
+	<form method="POST"><input type="text" name="data" value="hello" /><input type="submit" value="Post" /></form>
+	<div>Chip: <?lua print(node.chipid()) ?></div>
+	<div>HEAP: <?lua print(node.heap()) ?></div>
+	<div>GPIO3: <?lua print(gpio.read(3)) ?></div>
+	<div>GPIO4: <?lua print(gpio.read(4)) ?></div>
+	<a href="index.html">Html Page</a>
+	<a href="log.txt">log file</a>
+</body>
+</html>

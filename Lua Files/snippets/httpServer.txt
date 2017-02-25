@@ -1,0 +1,32 @@
+I'm new to this, having just started playing around with an ESP8266 after Christmas. I really appreciate this community and how much I've been able to learn from the rest of you.
+
+I've attached a web server script that goes beyond the other web server scripts I've found in the following areas:
+
+1. Implements keep-alives.
+2. Sends a Cache-Control header telling the browser or other client not to cache the response. Since the ESP8266 is usually used to read current data or control something, you don't want your client to skip the call and show you a previously cached response.
+3. Returns a 404 status for requests the server is not prepared to handle.
+4. Separates the logic of the web server and common tasks like parsing the URL from the logic used to process requests.
+
+Before starting the server you prepare a list of URLs the server will respond to and a function that will generate the response for each of these URLs. This list is passed into the startWeb function, which starts the server and begins listening for requests.
+
+Code: Select all
+pages = {}
+pages["/test"] = function(request)
+  return "<html><head><title>Web Test</title></head><body><h1>Web Test</h1><body>Request received: " .. request.method .. " " .. request.url .. "</body></html>"
+end  
+pages["/test2"] = function(request)
+  x = request.query["x"]
+  x2 = x * x
+  return "<html><head><title>Square</title></head><body><p>" .. x .. " squared is " .. x2 .. ".</p></body></html>"
+end
+w = startWeb({pages = pages})
+
+With each request the URL is parsed and the corresponding handler function is called with a parsed representation of the request URL. In this example a request for /test will return a simple page that just repeats the HTTP method and URL requested. A request for /test2 expects to get a get a numeric query parameter named x; it computes the square of this value. For example, http://192.168.1.113/test2?x=7 shows you that 7 squared is 49.
+
+You can check the status of the web server and shut it down with these calls:
+Code: Select all
+print(w.getStatus())
+w.close()
+
+
+

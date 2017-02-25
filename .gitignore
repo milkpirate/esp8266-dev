@@ -1,0 +1,81 @@
+#==================
+# esp8266 related
+#==================
+
+# binaries
+#==================
+*.exe
+*.bin
+
+# folders
+#==================
+Config/
+espLorer/
+Firmwares/
+LuaLoader/
+LuaSrcDiet*/
+nodemcu-uploader/
+nodemcu-httpserver*/
+thingspeaks_api/
+tmp/
+Web_TCP2UART/
+
+
+#==================
+# latex related
+#==================
+
+# usual latex ignores
+#==================
+*.aux
+*.glo
+*.idx
+*.log
+*.toc
+*.ist
+*.acn
+*.acr
+*.alg
+*.bbl
+*.blg
+*.dvi
+*.glg
+*.gls
+*.ilg
+*.ind
+*.lof
+*.lot
+*.maf
+*.mtc
+*.mtc1
+*.out
+*.synctex.gz
+*.w18
+
+# personal latex ignores
+#==================
+#*.pdf
+*.dpth
+#*.djvu
+#*.jpg
+#*.jpeg
+#*.
+#dokumente/
+
+# pythontex related
+#===================
+pythontex*/
+*.pytxmcr
+*.pytxpyg
+*.stdout
+*.pkl
+*.pytxcode
+
+# re-includes
+#==================
+#!master-figure?.pdf
+#!master-figure??.pdf
+#!master-figure???.pdf
+
+# even if they are in a sub dir
+#!*/
